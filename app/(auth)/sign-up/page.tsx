@@ -16,9 +16,8 @@ export default function SignUp() {
       setError(error.message ?? "Sign-up failed");
       return;
     }
-    // Phase 2 Task 13 will add /api/orgs/me to provision the personal org.
-    // For now just send the user to the library page.
-    window.location.href = "/library";
+    await fetch("/api/orgs/me", { method: "POST" });
+    window.location.href = "/api-keys";
   }
 
   return (
