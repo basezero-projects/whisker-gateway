@@ -19,13 +19,11 @@ export function generate({ env }: { env: Env }): GeneratedKey {
 }
 
 export function parse(input: string): { env: Env; prefix: string; secret: string } | null {
-  const parts = input.split("_");
-  if (parts.length !== 4 || parts[0] !== "wsk") return null;
-  const env = parts[1] === "live" ? "live" : parts[1] === "test" ? "test" : null;
-  if (!env) return null;
-  if (parts[2].length !== 8 || !/^[a-f0-9]+$/.test(parts[2])) return null;
-  if (parts[3].length < 16) return null;
-  return { env, prefix: parts[2], secret: parts[3] };
+  // base64url-encoded secrets can contain `_`, so split with a limit so the
+  // secret stays in one piece. Match must anchor to the wsk_<env>_<8 hex>_ shape.
+  const match = input.match(/^wsk_(live|test)_([a-f0-9]{8})_([A-Za-z0-9_-]{16,})$/);
+  if (!match) return null;
+  return { env: match[1] as Env, prefix: match[2], secret: match[3] };
 }
 
 export async function verifySecret(secret: string, hash: string): Promise<boolean> {
