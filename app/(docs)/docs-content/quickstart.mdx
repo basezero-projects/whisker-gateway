@@ -1,0 +1,26 @@
+# Quickstart
+
+## 1. Sign up
+
+Create an account at [whisker.syvr.dev/sign-up](/sign-up). The free tier ships with 60 transcription minutes/month.
+
+## 2. Get an API key
+
+Once signed in, head to [/api-keys](/api-keys) and click **Create**. Copy the full key (starts with `wsk_test_…` in dev, `wsk_live_…` in prod). You'll only see it once.
+
+## 3. Transcribe
+
+```bash
+curl -X POST https://api.whisker.syvr.dev/api/v1/transcribe \
+  -H "Authorization: Bearer wsk_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://www.youtube.com/watch?v=..."}'
+```
+
+Response:
+
+```json
+{ "id": 42, "status": "pending", "duplicate": false }
+```
+
+Poll the job status at `/api/v1/jobs/42` until it returns `{ "status": "done" }`. The transcript text + segments come back as part of the job result.

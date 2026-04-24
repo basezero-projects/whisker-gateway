@@ -1,0 +1,42 @@
+# API reference
+
+All endpoints live at `https://api.whisker.syvr.dev`. Authentication is via a Bearer token in the `Authorization` header. Generate keys at [/api-keys](/api-keys).
+
+## POST /api/v1/transcribe
+
+Body:
+
+```json
+{ "url": "https://www.youtube.com/watch?v=...", "force": false }
+```
+
+Returns a job descriptor. The actual transcription happens asynchronously.
+
+## GET /api/v1/jobs/:id
+
+Returns:
+
+```json
+{ "id": 42, "type": "transcribe.url", "status": "done", "result": { "transcript_id": 7, "duration": 482.3 } }
+```
+
+`status` cycles `queued → running → done | error`.
+
+## GET /api/v1/transcripts
+
+Lists your transcripts. Returns array of `{ id, url, title, status, duration, created_at }`.
+
+## GET /api/v1/transcripts/:id
+
+Returns one transcript with full text + segments.
+
+## GET /api/v1/search?q=foo&limit=40
+
+Full-text search across your transcripts.
+
+## Errors
+
+- `401` — missing/invalid API key.
+- `400` — malformed body.
+- `404` — resource not found.
+- `429` — rate limit (Pro/Scale only — Free tier returns `200` until quota exhaustion, then `402`).

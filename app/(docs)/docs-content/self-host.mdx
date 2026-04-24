@@ -1,0 +1,72 @@
+# Self-host guide
+
+The engine ships as a Docker image. Pull from GHCR:
+
+```bash
+docker pull ghcr.io/basezero-projects/whisker-engine:latest
+```
+
+## Quick start (single tenant, no gateway)
+
+```yaml
+# docker-compose.yml
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: whisker
+      POSTGRES_PASSWORD: whisker
+      POSTGRES_DB: whisker
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  engine:
+    image: ghcr.io/basezero-projects/whisker-engine:latest
+    command: ["serve"]
+    environment:
+      DATABASE_URL: "postgresql+psycopg://whisker:whisker@postgres:5432/whisker"
+      WHISPER_DEVICE: "cuda"      # or "cpu"
+      WHISPER_COMPUTE: "float16"  # or "int8" for CPU
+    ports:
+      - "8765:8765"
+    depends_on:
+      - postgres
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+
+volumes:
+  postgres:
+```
+
+`docker compose up -d`. Hit `http://localhost:8765/api/transcripts` to confirm it serves.
+
+## Adding the gateway
+
+For multi-user deployments add the `whisker-gateway` Next.js project (separate Docker image, or deploy on Vercel against the same Postgres). The gateway handles auth, API keys, billing, and proxies to the engine over HMAC-signed HTTP.
+
+```bash
+git clone https://github.com/basezero-projects/whisker-gateway
+cd whisker-gateway
+pnpm install
+cp .env.example .env
+# Set DATABASE_URL to the same Postgres + WHISKER_INTERNAL_SECRET to a value
+# the engine also has in its env.
+pnpm db:migrate
+pnpm dev
+```
+
+## Configuration
+
+| Env var | Default | Notes |
+|---|---|---|
+| `DATABASE_URL` | `sqlite:///%APPDATA%/whisker/transcripts.db` | SQLite for single-user; Postgres for multi-user. |
+| `BLOB_URL` | `file://...` | Use `s3://bucket?endpoint=...&access_key=...&secret_key=...&region=...` for R2/MinIO/S3. |
+| `WHISPER_MODEL` | `large-v3` | Any faster-whisper-supported model id. |
+| `WHISPER_DEVICE` | `cuda` | `cuda` or `cpu`. |
+| `WHISPER_COMPUTE` | `float16` | `float16` for GPU, `int8` for CPU. |
+| `WHISKER_INTERNAL_SECRET` | (unset) | Required when running with the gateway. |
+| `WHISKER_GATEWAY_URL` | (unset) | Engine emits usage callbacks here on job success. |
+| `SENTRY_DSN` | (unset) | Optional. |
