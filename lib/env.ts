@@ -10,6 +10,10 @@ const Schema = z.object({
   STRIPE_PUBLISHABLE_KEY: z.string().startsWith("pk_").optional(),
   STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_"),
   STRIPE_PRICE_ID_USAGE: z.string().startsWith("price_"),
+  SENTRY_DSN: z.string().url().optional(),
+  NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+  SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
+  NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
 });
 
 export const env = Schema.parse(process.env);
