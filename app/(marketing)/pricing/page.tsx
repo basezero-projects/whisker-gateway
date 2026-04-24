@@ -1,13 +1,25 @@
 import Link from "next/link";
+import UpgradeButton from "@/components/UpgradeButton";
 
-const tiers = [
+type Tier = {
+  name: string;
+  price: string;
+  cadence: string;
+  minutes: string;
+  features: string[];
+  cta:
+    | { type: "link"; label: string; href: string }
+    | { type: "upgrade"; label: string };
+};
+
+const tiers: Tier[] = [
   {
     name: "Free",
     price: "$0",
     cadence: "/month",
     minutes: "60 minutes/month",
     features: ["Hosted API", "60 min/month", "Email support"],
-    cta: { label: "Sign up", href: "/sign-up" },
+    cta: { type: "link", label: "Sign up", href: "/sign-up" },
   },
   {
     name: "Pro",
@@ -15,7 +27,7 @@ const tiers = [
     cadence: "/month + usage",
     minutes: "Then $0.05/min",
     features: ["Hosted API", "Includes 600 min", "$0.05/min after", "Priority support"],
-    cta: { label: "Start free trial", href: "/sign-up?plan=pro" },
+    cta: { type: "upgrade", label: "Start free trial" },
   },
   {
     name: "Scale",
@@ -23,7 +35,7 @@ const tiers = [
     cadence: "",
     minutes: "Volume + on-prem options",
     features: ["Self-host license", "Volume pricing", "SLA support", "Dedicated worker"],
-    cta: { label: "Contact us", href: "mailto:hello@syvr.dev?subject=Whisker%20Scale" },
+    cta: { type: "link", label: "Contact us", href: "mailto:hello@syvr.dev?subject=Whisker%20Scale" },
   },
 ];
 
@@ -47,9 +59,13 @@ export default function PricingPage() {
             <ul className="text-sm space-y-1 flex-1">
               {t.features.map((f) => <li key={f}>· {f}</li>)}
             </ul>
-            <Link href={t.cta.href} className="bg-black text-white rounded px-4 py-2 text-center">
-              {t.cta.label}
-            </Link>
+            {t.cta.type === "upgrade" ? (
+              <UpgradeButton label={t.cta.label} />
+            ) : (
+              <Link href={t.cta.href} className="bg-black text-white rounded px-4 py-2 text-center">
+                {t.cta.label}
+              </Link>
+            )}
           </div>
         ))}
       </div>
