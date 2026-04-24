@@ -34,6 +34,7 @@ export const sessions = gateway.table("sessions", {
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const accounts = gateway.table("accounts", {
@@ -42,7 +43,14 @@ export const accounts = gateway.table("accounts", {
   providerId: text("provider_id").notNull(),
   accountId: text("account_id").notNull(),
   password: text("password"),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  idToken: text("id_token"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at"),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+  scope: text("scope"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const verifications = gateway.table("verifications", {
@@ -51,6 +59,7 @@ export const verifications = gateway.table("verifications", {
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 // --- whisker-specific gateway tables ---

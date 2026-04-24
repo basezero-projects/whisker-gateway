@@ -8,6 +8,13 @@
       "when": 1777049976819,
       "tag": "0000_smooth_triton",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777050445363,
+      "tag": "0001_thick_daredevil",
+      "breakpoints": true
     }
   ]
 }
